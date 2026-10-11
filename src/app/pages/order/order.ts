@@ -1,3 +1,4 @@
+import {DeliveryApi} from '../../services/delivery-api';
 import {Component, OnInit, OnDestroy, signal} from '@angular/core';
 import {UpperCasePipe} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -17,7 +18,7 @@ export class Order implements OnInit, OnDestroy {
  private formSubscription?: Subscription;
  private suggestions: any[] = [];
  private disposed = false;
- constructor(private formBuilder: FormBuilder) {
+ constructor(private formBuilder: FormBuilder, private deliveryApi: DeliveryApi) {
   this.routeForm = this.formBuilder.group({from:['',Validators.required],to:['',Validators.required],size:['xs',Validators.required],speed:['regular',Validators.required]});
   this.orderForm = this.formBuilder.group({name:['',Validators.required],phone:['',Validators.required],comment:['']});
  }
@@ -39,6 +40,7 @@ export class Order implements OnInit, OnDestroy {
  public selectSize(size:string) {this.routeForm.controls['size'].setValue(size);}
  public selectSpeed(speed:string) {this.routeForm.controls['speed'].setValue(speed);}
  public calculate() {
+  this.routeForm.markAllAsTouched();
   this.calculationResult.set(null);
   if (!this.map || this.routeForm.invalid) return;
   const {from,to,size,speed} = this.routeForm.getRawValue();
@@ -68,6 +70,7 @@ export class Order implements OnInit, OnDestroy {
   alert('Не удалось построить маршрут. Проверьте адреса и выбранные параметры.');
  }
  public submitOrder() {
+  this.orderForm.markAllAsTouched();
   const calculation = this.calculationResult();
   if (!calculation) {alert('Сначала рассчитайте стоимость, чтобы оформить заявку');return;}
   if (this.orderForm.invalid) {alert('Введите имя и корректный телефон');return;}
@@ -76,8 +79,10 @@ export class Order implements OnInit, OnDestroy {
   const trimmedPhone = (phone ?? '').trim();
   const trimmedComment = (comment ?? '').trim();
   const payload = {customer:{name:trimmedName,phone:trimmedPhone,comment:trimmedComment},calculation,createdAt:new Date().toISOString()};
-  console.log(payload);
-  this.orderId.set(1);
+  this.deliveryApi.createDelivery(payload).subscribe(response => {
+   if ('error' in response) {alert(response.error);return;}
+   this.orderId.set(response.id);
+  });
  }
  ngOnDestroy() {
   this.disposed = true;

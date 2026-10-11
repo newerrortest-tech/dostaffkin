@@ -16,12 +16,18 @@
                         <input id="from" formControlName="from" placeholder="Откуда: начните вводить адрес" autocomplete="off" />
                         <div class="main-ac" id="fromAc" role="listbox" aria-label="Подсказки адресов"></div>
                     </div>
+                    @if (routeForm.get('from')?.invalid && (routeForm.get('from')?.dirty || routeForm.get('from')?.touched)) {
+                      <label for="from" class="input-error">Заполните поле Откуда</label>
+                    }
 
                     <div class="main-field" id="toField">
                         <div class="main-pin"></div>
                         <input id="to" formControlName="to" placeholder="Куда: начните вводить адрес" autocomplete="off" />
                         <div class="main-ac" id="toAc" role="listbox" aria-label="Подсказки адресов"></div>
                     </div>
+                    @if (routeForm.get('to')?.invalid && (routeForm.get('to')?.dirty || routeForm.get('to')?.touched)) {
+                      <label for="to" class="input-error">Заполните поле Куда</label>
+                    }
                 </div>
             </div>
             <div class="main-package">
@@ -74,13 +80,21 @@
                     <div class="main-block-info-row">
                         <div class="main-block-title">Контакты</div>
                         <div class="order-fields">
-                            <div class="main-field">
+                            <div class="contact-field"><div class="main-field">
                                 <input id="customerName" formControlName="name" placeholder="Ваше имя" autocomplete="off" />
                             </div>
-                            <div class="main-field">
+ @if (orderForm.get('name')?.invalid && (orderForm.get('name')?.dirty || orderForm.get('name')?.touched)) {
+ <label for="customerName" class="input-error">Заполните имя</label>
+ }
+ </div>
+                            <div class="contact-field"><div class="main-field">
                                 <input id="customerPhone" formControlName="phone" placeholder="Ваш телефон" autocomplete="off"
                                     inputmode="tel" />
                             </div>
+ @if (orderForm.get('phone')?.invalid && (orderForm.get('phone')?.dirty || orderForm.get('phone')?.touched)) {
+ <label for="customerPhone" class="input-error">Заполните телефон</label>
+ }
+ </div>
                         </div>
                     </div>
                     <div class="main-block-info-row extra-info">
